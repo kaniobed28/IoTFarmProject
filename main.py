@@ -1,35 +1,38 @@
-from machine import Pin
+import paho.mqtt.client as mqtt
 import time
-import network
-from umqtt.simple import MQTTClient
-import dht
+import json
+
+# Define the callback for when the client receives a CONNACK response from the server.
+def on_connect(client, userdata, flags, rc):
+    print("Connected with result code "+str(rc))
+    # Subscribing in on_connect() means that if we lose the connection and
+    # reconnect then subscriptions will be renewed.
+    client.subscribe("mytopic")
+
+# Define the callback for when a PUBLISH message is received from the server.
+def on_message(client, userdata, msg):
+    print(msg.topic+" "+str(msg.payload.decode()))
+    with open('data.txt', 'a') as f:
+        data = msg.payload.decode()
+        data = data[1:-1]
+        f.writelines(data +'\n')
+
+# Create a new instance of the client.
+client = mqtt.Client()
+client.on_connect = on_connect
+client.on_message = on_message
+
+# Connect to the broker.
+client.connect("broker.mqttdashboard.com", 1883, 60)
+
+# Start the network loop.
+# client.loop_start()
+
+# Publish a message to the broker.
 
 
-def on_message(topic, msg):
-    print("Topic: {}, Message: {}".format(topic, msg.decode()))
-
-
-pin15 = Pin(15,Pin.OUT)
-sta_if = network.WLAN(network.STA_IF)
-sta_if.active(True)
-sta_if.connect('DESKTOP-OS6KTER 0020', '33333333')
-while not sta_if.isconnected():
-    print('...')
-    time.sleep(2)
-print('Connection successful')
-print('Network config:', sta_if.ifconfig())
-#from umqtt.simple import MQTTClient
-
-def sub_cb(topic, msg):
-    print((topic, msg))
-
-client = MQTTClient("clientId-LYP4YjRWAj", "10.76.11.239",keepalive=10)
-client.set_callback(on_message)
-client.connect()
-print('mqtt connected')
-client.subscribe(b"testtopic/1")
-#client.publish(b"testtopic/1", b"hello")
-while True:
-    client.check_msg()
-    print('checking')
-    time.sleep(2)
+# Wait for the message to be sent.
+# client.loop_stop()
+client.loop_forever()
+client.publish("farm", "Hello World")
+time.sleep(2)

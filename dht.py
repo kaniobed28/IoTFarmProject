@@ -12,11 +12,12 @@ def random_dht():
     
     humd = random.randint(0,35)
     print(temp,humd)
-    data = {
+    '''data = {
         'temp':temp,
         'humd':humd
         }
-    return json.dumps(data)
+    return json.dumps(data)'''
+    return temp,humd
 #function to read data from the dht sensor
 def read_dht_data(pin_num):
     d = dht.DHT11(Pin(pin_num,Pin.IN))
@@ -71,7 +72,7 @@ client = mqtt_connect('dhtclient','broker.mqttdashboard.com')
 mqtt_publish(client,'mytopic','this is a message')
 sub_client = mqtt_subscribe(client,'dhtclient')
 while True:
-    mqtt_publish(client,'mytopic',(random_dht()))
+    mqtt_publish(client,'mytopic',str(random_dht()))
     random_dht()
     sub_client.check_msg()
     sleep(2)
