@@ -5,19 +5,26 @@ import random
 import json
 from machine import Pin
 import dht
+import utime
+
+
+
+
+
+def current_time():
+    current_time = utime.localtime()
+    time_str = "{:04d}-{:02d}-{:02d} {:02d}:{:02d}:{:02d}".format(*current_time[:6])
+    return time_str
+
 
 # function to generate random numbers for experiment
 def random_dht():
     temp = random.randint(0,35)
     
     humd = random.randint(0,35)
-    print(temp,humd)
-    '''data = {
-        'temp':temp,
-        'humd':humd
-        }
-    return json.dumps(data)'''
-    return temp,humd
+    print(temp,humd,current_time())
+
+    return temp,humd,current_time()
 #function to read data from the dht sensor
 def read_dht_data(pin_num):
     d = dht.DHT11(Pin(pin_num,Pin.IN))
@@ -73,9 +80,9 @@ mqtt_publish(client,'mytopic','this is a message')
 sub_client = mqtt_subscribe(client,'dhtclient')
 while True:
     mqtt_publish(client,'mytopic',str(random_dht()))
-    random_dht()
+    #random_dht()
     sub_client.check_msg()
-    sleep(2)
+    sleep(6)
     #read_dht_data(15)
 
 
