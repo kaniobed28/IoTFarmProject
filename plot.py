@@ -52,6 +52,9 @@ def animate(i):
     ax1.clear()
     ax1.plot(ts,xs, label= 'temperature')
     ax1.plot(ts,ys, label = 'humidity')
+    ax1.set_xlabel("TIME")
+    ax1.set_title("FARM MONITORING PROJECT")
+
     ax1.set_xticks([])
     ax1.legend()
 
